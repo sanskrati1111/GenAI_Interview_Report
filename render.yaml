@@ -2,7 +2,7 @@ services:
   - type: web
     name: projects
     runtime: node
-    startCommand: npm run start
+    startCommand: node Backend/server.js
     buildCommand: npm run build
     envVars:
       - key: NODE_VERSION
