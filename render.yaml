@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: projects
+    runtime: node
+    startCommand: npm run start
+    buildCommand: npm run build
+    envVars:
+      - key: NODE_VERSION
+        value: 18
