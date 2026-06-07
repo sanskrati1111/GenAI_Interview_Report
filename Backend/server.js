@@ -12,9 +12,9 @@ const _dirname= path.resolve();
     console.log('Connected to MongoDB');
 
 
-    app.use(express.static(path.join(_dirname, "/frontend/dist")));
+    app.use(express.static(path.join(_dirname, "/Frontend/dist")));
     app.get(/.*/, (req, res) => {
-      res.sendFile(path.join(_dirname, "/frontend/dist/index.html"));
+      res.sendFile(path.join(_dirname, "/Frontend/dist/index.html"));
     });
 
     
