@@ -1,218 +1,6 @@
-
-Claude finished the response
-
-style.scss
-scss
-
-
-auth.form.scss
-scss
-
-
-home.scss
-scss
-
-
-interview.scss
-scss
-
-
-App.jsx
-17 lines
-
-jsx
-
-
-app.routes.jsx
-26 lines
-
-jsx
-
-
-main.jsx
-10 lines
-
-jsx
-
-
-interview.context.jsx
-17 lines
-
-jsx
-
-i want to make my website responsive, i am sending you files check if its mobile responsive or not. .
-
-Jun 7
-
-Viewed 4 files
-Viewed 4 files
-Here's a thorough audit of your files:
-
-✅ What's Already Mobile-Responsive
-Your CSS is actually quite well done. Here's what's working:
-
-auth_form.scss — Fully responsive. Has breakpoints at 768px and 480px for the form container, inputs, and labels.
-
-home.scss — Very thorough. Covers padding, font sizes, flex direction changes, button stacking, and the two-panel layout collapsing correctly on mobile.
-
-interview.scss — Has good breakpoints for the 3-column layout collapsing to vertical on ≤1024px, nav becoming horizontal/scrollable, and content padding adjusting.
-
-⚠️ Issues Found
-1. interview.scss — Sidebar has NO mobile breakpoints (biggest issue)
-The .interview-sidebar is 240px wide with no responsive rules. On mobile, after the layout goes vertical at ≤1024px, the sidebar will render full-width but its internal layout isn't adjusted:
-
-scss
-// Current — no media queries at all
-.interview-sidebar {
-    width: 240px;   // ← fixed width, breaks on vertical layout
-    flex-shrink: 0;
-    padding: 1.75rem 1.25rem;
-    ...
-}
-Fix:
-
-scss
-.interview-sidebar {
-    width: 240px;
-    flex-shrink: 0;
-    padding: 1.75rem 1.25rem;
-
-    @media (max-width: 1024px) {
-        width: 100%;
-        padding: 1.25rem;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    @media (max-width: 480px) {
-        padding: 0.75rem;
-    }
-}
-2. interview.scss — Duplicate class definitions
-.content-header, .q-list, and .q-card are defined twice in the file (lines ~214 and ~642). The second definitions have no media queries, so they override the responsive ones. You should remove the duplicate blocks at the bottom (lines ~642–770).
-
-3. interview.scss — .score--high block has a stray unclosed scope
-Around line 626–640 there's a .score--high rule that appears to contain a stray section and .content-header block inside it, which is a syntax/scoping bug:
-
-scss
-&.score--high {
-    border-color: $severity-low;
-}
-// ← several blank lines, then:
-    section { ... }      // incorrectly nested!
-}                        // closes some outer scope
-.content-header { ... }  // duplicate
-Clean up that section carefully.
-
-4. home.scss — .report-item cards don't have a min/max width on small screens
-scss
-.report-item {
-    flex: 1;
-    flex-shrink: 0;  // ← this prevents shrinking on mobile
-    ...
-}
-On very small screens, flex-shrink: 0 combined with flex: 1 can cause horizontal overflow. Add:
-
-scss
-@media (max-width: 480px) {
-    flex-shrink: 1;
-    min-width: 100%;  // stack cards vertically on mobile
-}
-5. style.scss — Missing viewport meta tag reminder
-Your global CSS looks fine, but make sure your index.html has this tag — without it, all your media queries won't work on mobile browsers:
-
-html
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-Summary
-File	Status
-auth_form.scss	✅ Fully responsive
-home.scss	✅ Mostly good — minor fix for report cards
-interview.scss	⚠️ Sidebar missing breakpoints, duplicate classes override responsive rules
-style.scss	✅ Fine
-The most impactful fix is removing the duplicate class definitions in interview.scss and adding responsive rules to .interview-sidebar.
-
-1780857682869_image.png
-
-interview.scss
-scss
-
-
-Interview.jsx
-213 lines
-
-jsx
-
-i am sending you interview.jsx and scss, make it responsive not like this: and provide me with updated file
-
-12:12 AM
-
-Read the interview.scss file
-Read the interview.scss file
-I can see the issues clearly. The problems are:
-
-The nav and sidebar render side-by-side with the content on mobile (broken layout in screenshot)
-.interview-sidebar has no mobile breakpoints — it stays 240px wide
-The "Download Resume" button overflows awkwardly
-Duplicate/broken class definitions at the bottom of the scss file
-The fix: on mobile, the layout should stack as nav tabs → content → sidebar, with the sidebar becoming a horizontal summary strip.
-
-
-Extract the truncated middle section of interview.scss
-Extract the truncated middle section of interview.scss
-Good, I have everything. Now I'll write a clean, fixed interview.scss and a slightly updated Interview.jsx that moves the sidebar data into a collapsible mobile summary strip.
-
-
-Clean, fully responsive interview.scss - removes duplicate blocks, fixes sidebar, fixes nav layout
-Clean, fully responsive interview.scss - removes duplicate blocks, fixes sidebar, fixes nav layout
-Now update the JSX to add the &__info block inside match score for the horizontal layout, and move the Download button to the right in the nav:
-
-
-Updated Interview.jsx with responsive layout fixes
-Updated Interview.jsx with responsive layout fixes
-The match-score__sub duplication in JSX isn't clean — let me simplify that part:
-
-
-Clean up the match score JSX - no duplicate sub element needed
-Clean up the match score JSX - no duplicate sub element needed
-Now update the scss to handle the __sub properly — on desktop it shows below the ring, on tablet it's inside __info:
-
-
-Edited a file, ran a command, read a file
-Edited a file, ran a command, read a file
-Here's a summary of what was fixed:
-
-The core problem — on mobile/tablet the 3-column layout (nav | content | sidebar) was trying to all sit in a row, making the nav and sidebar each take a chunk of width and squishing the content.
-
-What changed:
-
-interview.scss
-
-Removed the entire duplicate block of classes at the bottom (lines ~637–986) that were overriding your responsive rules
-.interview-sidebar — added full breakpoints: on ≤1024px it becomes a horizontal row with match score + skill gaps side by side; on ≤480px it stacks vertically again
-.interview-nav — on ≤1024px the nav becomes a scrollable horizontal tab bar, with the Download button tucked to the right; nav items get a subtle border to look like pill tabs
-.match-score — on tablet it flips to flex-direction: row so the ring sits beside the label/text
-Fixed broken } scope at the bottom of the original file that was causing the sass to mis-parse
-Interview.jsx
-
-Added match-score__info div (label + sub text) that only shows in horizontal layout via CSS, so the score ring has proper context text next to it on mobile
-
-Interview
-Code · SCSS 
-
-Interview
-Code · JSX 
-
-Want to be notified when Claude responds?
-
-
-
-
-Claude is AI and can make mistakes. Please double-check responses.
-Interview · SCSS
 // ── Variables ─────────────────────────────────────────────────────────────────
 @use "sass:color";
- 
+
 $bg-page:        #0d1117;
 $bg-card:        #161b22;
 $bg-panel:       #1c2230;
@@ -222,13 +10,13 @@ $text-primary:   #e6edf3;
 $text-muted:     #7d8590;
 $accent:         #ff2d78;
 $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
- 
+
 $severity-high:   #ff4d4d;
 $severity-medium: #f5a623;
 $severity-low:    #3fb950;
- 
+
 *::-webkit-scrollbar { display: none; }
- 
+
 // ── Loading Screen ────────────────────────────────────────────────────────────
 .loading-screen {
     width: 100%;
@@ -243,7 +31,7 @@ $severity-low:    #3fb950;
     padding: 2rem;
     text-align: center;
 }
- 
+
 // ── Page Shell ────────────────────────────────────────────────────────────────
 .interview-page {
     width: 100%;
@@ -255,11 +43,11 @@ $severity-low:    #3fb950;
     align-items: stretch;
     padding: 1.5rem;
     box-sizing: border-box;
- 
+
     @media (max-width: 768px) { padding: 0.75rem; }
     @media (max-width: 480px) { padding: 0.5rem; }
 }
- 
+
 // ── 3-Column Layout ───────────────────────────────────────────────────────────
 .interview-layout {
     display: flex;
@@ -270,28 +58,28 @@ $severity-low:    #3fb950;
     border: 1px solid $border-color;
     border-radius: 1rem;
     overflow: hidden;
- 
+
     // On tablet & below: stack vertically
     @media (max-width: 1024px) {
         flex-direction: column;
     }
- 
+
     @media (max-width: 768px) {
         border-radius: 0.75rem;
     }
 }
- 
+
 .interview-divider {
     width: 1px;
     background-color: $border-color;
     flex-shrink: 0;
- 
+
     @media (max-width: 1024px) {
         width: 100%;
         height: 1px;
     }
 }
- 
+
 // ── Left Nav ──────────────────────────────────────────────────────────────────
 .interview-nav {
     width: 220px;
@@ -301,7 +89,7 @@ $severity-low:    #3fb950;
     flex-direction: column;
     justify-content: space-between;
     gap: 0.25rem;
- 
+
     // Tablet: horizontal scrollable tab bar
     @media (max-width: 1024px) {
         width: 100%;
@@ -311,7 +99,7 @@ $severity-low:    #3fb950;
         justify-content: flex-start;
         gap: 0.5rem;
         overflow-x: auto;
- 
+
         .nav-content {
             display: flex;
             flex-direction: row;
@@ -319,23 +107,23 @@ $severity-low:    #3fb950;
             flex: 1;
             overflow-x: auto;
         }
- 
+
         // Download button moves to far right, stays compact
         .button.primary-button {
             flex-shrink: 0;
             padding: 0.5rem 0.9rem;
             font-size: 0.78rem;
             white-space: nowrap;
- 
+
             svg { display: none; } // hide sparkle icon on mobile nav
         }
     }
- 
+
     @media (max-width: 480px) {
         padding: 0.6rem 0.75rem;
         gap: 0.4rem;
     }
- 
+
     &__label {
         font-size: 0.7rem;
         font-weight: 600;
@@ -344,10 +132,10 @@ $severity-low:    #3fb950;
         color: $text-muted;
         padding: 0 0.75rem;
         margin-bottom: 0.5rem;
- 
+
         @media (max-width: 1024px) { display: none; }
     }
- 
+
     &__item {
         display: flex;
         align-items: center;
@@ -364,7 +152,7 @@ $severity-low:    #3fb950;
         text-align: left;
         transition: background-color 0.15s, color 0.15s;
         white-space: nowrap;
- 
+
         @media (max-width: 1024px) {
             width: auto;
             flex-shrink: 0;
@@ -372,38 +160,38 @@ $severity-low:    #3fb950;
             font-size: 0.8rem;
             border: 1px solid $border-color;
         }
- 
+
         @media (max-width: 480px) {
             padding: 0.45rem 0.6rem;
             font-size: 0.75rem;
             gap: 0.4rem;
         }
- 
+
         &:hover {
             background-color: $bg-panel;
             color: $text-primary;
         }
- 
+
         &--active {
             background-color: rgba($accent, 0.1);
             color: $accent;
             border-color: rgba($accent, 0.3) !important;
- 
+
             .interview-nav__icon svg { stroke: $accent; }
         }
     }
- 
+
     &__icon {
         display: flex;
         align-items: center;
         flex-shrink: 0;
- 
+
         @media (max-width: 480px) {
             svg { width: 14px; height: 14px; }
         }
     }
 }
- 
+
 // ── Download Button ───────────────────────────────────────────────────────────
 .button.primary-button {
     display: flex;
@@ -421,11 +209,11 @@ $severity-low:    #3fb950;
     font-family: $font-stack;
     transition: opacity 0.2s, transform 0.1s;
     white-space: nowrap;
- 
+
     &:hover { opacity: 0.9; }
     &:active { transform: scale(0.98); }
 }
- 
+
 // ── Center Content ────────────────────────────────────────────────────────────
 .interview-content {
     flex: 1;
@@ -433,22 +221,22 @@ $severity-low:    #3fb950;
     overflow-y: auto;
     max-height: calc(100vh - 3rem);
     padding-bottom: 5rem;
- 
+
     @media (max-width: 1024px) {
         max-height: none;
         overflow-y: visible;
         padding: 1.25rem 1.25rem 2rem;
     }
- 
+
     @media (max-width: 768px) {
         padding: 1rem 1rem 1.5rem;
     }
- 
+
     @media (max-width: 480px) {
         padding: 0.75rem 0.75rem 1.25rem;
     }
 }
- 
+
 // ── Content Header ────────────────────────────────────────────────────────────
 .content-header {
     display: flex;
@@ -457,23 +245,23 @@ $severity-low:    #3fb950;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid $border-color;
- 
+
     @media (max-width: 768px) {
         margin-bottom: 1rem;
         padding-bottom: 0.75rem;
         gap: 0.5rem;
     }
- 
+
     h2 {
         font-size: 1.1rem;
         font-weight: 700;
         color: $text-primary;
         margin: 0;
- 
+
         @media (max-width: 768px) { font-size: 1rem; }
         @media (max-width: 480px) { font-size: 0.95rem; }
     }
- 
+
     &__count {
         font-size: 0.8rem;
         color: $text-muted;
@@ -481,34 +269,34 @@ $severity-low:    #3fb950;
         padding: 0.15rem 0.6rem;
         border-radius: 2rem;
         border: 1px solid $border-color;
- 
+
         @media (max-width: 480px) {
             font-size: 0.7rem;
             padding: 0.1rem 0.45rem;
         }
     }
 }
- 
+
 // ── Question Cards ────────────────────────────────────────────────────────────
 .q-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
- 
+
     @media (max-width: 480px) { gap: 0.5rem; }
 }
- 
+
 .q-card {
     background-color: $bg-panel;
     border: 1px solid $border-color;
     border-radius: 0.6rem;
     overflow: hidden;
     transition: border-color 0.2s;
- 
+
     @media (max-width: 480px) { border-radius: 0.5rem; }
- 
+
     &:hover { border-color: color.adjust($border-color, $lightness: 8%); }
- 
+
     &__header {
         display: flex;
         align-items: flex-start;
@@ -516,13 +304,13 @@ $severity-low:    #3fb950;
         padding: 0.9rem 1rem;
         cursor: pointer;
         user-select: none;
- 
+
         @media (max-width: 480px) {
             padding: 0.75rem 0.85rem;
             gap: 0.6rem;
         }
     }
- 
+
     &__index {
         flex-shrink: 0;
         font-size: 0.7rem;
@@ -533,13 +321,13 @@ $severity-low:    #3fb950;
         border-radius: 0.3rem;
         padding: 0.15rem 0.4rem;
         margin-top: 2px;
- 
+
         @media (max-width: 480px) {
             font-size: 0.65rem;
             padding: 0.1rem 0.3rem;
         }
     }
- 
+
     &__question {
         flex: 1;
         margin: 0;
@@ -547,56 +335,56 @@ $severity-low:    #3fb950;
         font-weight: 500;
         color: $text-primary;
         line-height: 1.5;
- 
+
         @media (max-width: 480px) {
             font-size: 0.85rem;
             line-height: 1.4;
         }
     }
- 
+
     &__chevron {
         flex-shrink: 0;
         color: $text-muted;
         transition: transform 0.2s;
         margin-top: 2px;
- 
+
         &--open {
             transform: rotate(180deg);
             color: $accent;
         }
     }
- 
+
     &__body {
         padding: 0.75rem 1rem 1rem;
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
         border-top: 1px solid $border-color;
- 
+
         @media (max-width: 480px) {
             padding: 0.65rem 0.85rem 0.85rem;
             gap: 0.6rem;
         }
     }
- 
+
     &__section {
         display: flex;
         flex-direction: column;
         gap: 0.4rem;
- 
+
         p {
             margin: 0;
             font-size: 0.835rem;
             color: color.adjust($text-muted, $lightness: 15%);
             line-height: 1.6;
- 
+
             @media (max-width: 480px) {
                 font-size: 0.78rem;
                 line-height: 1.5;
             }
         }
     }
- 
+
     &__tag {
         font-size: 0.68rem;
         font-weight: 700;
@@ -605,18 +393,18 @@ $severity-low:    #3fb950;
         padding: 0.15rem 0.5rem;
         border-radius: 0.25rem;
         width: fit-content;
- 
+
         @media (max-width: 480px) {
             font-size: 0.62rem;
             padding: 0.1rem 0.4rem;
         }
- 
+
         &--intention {
             color: #a78bfa;
             background-color: rgba(#a78bfa, 0.1);
             border: 1px solid rgba(#a78bfa, 0.2);
         }
- 
+
         &--answer {
             color: #3fb950;
             background-color: rgba(#3fb950, 0.1);
@@ -624,14 +412,14 @@ $severity-low:    #3fb950;
         }
     }
 }
- 
+
 // ── Road Map ──────────────────────────────────────────────────────────────────
 .roadmap-list {
     display: flex;
     flex-direction: column;
     gap: 0;
     position: relative;
- 
+
     &::before {
         content: '';
         position: absolute;
@@ -641,23 +429,23 @@ $severity-low:    #3fb950;
         width: 2px;
         background: linear-gradient(to bottom, $accent, rgba($accent, 0.1));
         border-radius: 1px;
- 
+
         @media (max-width: 480px) { left: 22px; }
     }
 }
- 
+
 .roadmap-day {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     padding: 0.75rem 0 0.75rem 3.5rem;
     position: relative;
- 
+
     @media (max-width: 480px) {
         padding: 0.6rem 0 0.6rem 2.75rem;
         gap: 0.4rem;
     }
- 
+
     &::before {
         content: '';
         position: absolute;
@@ -668,22 +456,22 @@ $severity-low:    #3fb950;
         border-radius: 50%;
         background-color: $bg-card;
         border: 2px solid $accent;
- 
+
         @media (max-width: 480px) {
             left: 15px;
             width: 12px;
             height: 12px;
         }
     }
- 
+
     &__header {
         display: flex;
         align-items: center;
         gap: 0.6rem;
- 
+
         @media (max-width: 480px) { gap: 0.5rem; }
     }
- 
+
     &__badge {
         font-size: 0.7rem;
         font-weight: 700;
@@ -692,22 +480,22 @@ $severity-low:    #3fb950;
         border: 1px solid rgba($accent, 0.25);
         padding: 0.1rem 0.5rem;
         border-radius: 2rem;
- 
+
         @media (max-width: 480px) {
             font-size: 0.65rem;
             padding: 0.08rem 0.4rem;
         }
     }
- 
+
     &__focus {
         margin: 0;
         font-size: 0.95rem;
         font-weight: 600;
         color: $text-primary;
- 
+
         @media (max-width: 480px) { font-size: 0.9rem; }
     }
- 
+
     &__tasks {
         list-style: none;
         margin: 0;
@@ -715,7 +503,7 @@ $severity-low:    #3fb950;
         display: flex;
         flex-direction: column;
         gap: 0.35rem;
- 
+
         li {
             display: flex;
             align-items: flex-start;
@@ -723,7 +511,7 @@ $severity-low:    #3fb950;
             font-size: 0.845rem;
             color: color.adjust($text-muted, $lightness: 12%);
             line-height: 1.5;
- 
+
             @media (max-width: 480px) {
                 font-size: 0.78rem;
                 gap: 0.4rem;
@@ -731,7 +519,7 @@ $severity-low:    #3fb950;
             }
         }
     }
- 
+
     &__bullet {
         flex-shrink: 0;
         width: 5px;
@@ -739,7 +527,7 @@ $severity-low:    #3fb950;
         border-radius: 50%;
         background-color: $text-muted;
         margin-top: 8px;
- 
+
         @media (max-width: 480px) {
             width: 4px;
             height: 4px;
@@ -747,7 +535,7 @@ $severity-low:    #3fb950;
         }
     }
 }
- 
+
 // ── Right Sidebar ─────────────────────────────────────────────────────────────
 .interview-sidebar {
     width: 240px;
@@ -756,7 +544,7 @@ $severity-low:    #3fb950;
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
- 
+
     // Tablet: becomes a horizontal row below content
     @media (max-width: 1024px) {
         width: 100%;
@@ -766,33 +554,33 @@ $severity-low:    #3fb950;
         padding: 1.25rem;
         gap: 1.5rem;
     }
- 
+
     @media (max-width: 768px) {
         padding: 1rem;
         gap: 1rem;
     }
- 
+
     @media (max-width: 480px) {
         flex-direction: column;
         padding: 0.75rem;
         gap: 0.75rem;
     }
 }
- 
+
 .sidebar-divider {
     height: 1px;
     background-color: $border-color;
- 
+
     @media (max-width: 1024px) { display: none; }
 }
- 
+
 // ── Match Score ───────────────────────────────────────────────────────────────
 .match-score {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.6rem;
- 
+
     @media (max-width: 1024px) {
         flex: 1;
         min-width: 140px;
@@ -800,13 +588,13 @@ $severity-low:    #3fb950;
         align-items: center;
         gap: 1rem;
     }
- 
+
     @media (max-width: 480px) {
         flex-direction: row;
         align-items: center;
         gap: 1rem;
     }
- 
+
     &__label {
         font-size: 0.75rem;
         font-weight: 600;
@@ -815,10 +603,10 @@ $severity-low:    #3fb950;
         color: $text-muted;
         margin: 0;
         align-self: flex-start;
- 
+
         @media (max-width: 1024px) { display: none; } // label shown inside ring context
     }
- 
+
     &__ring {
         width: 90px;
         height: 90px;
@@ -829,43 +617,43 @@ $severity-low:    #3fb950;
         align-items: center;
         justify-content: center;
         border: 4px solid;
- 
+
         @media (max-width: 1024px) {
             width: 70px;
             height: 70px;
             border-width: 3px;
         }
- 
+
         &.score--high { border-color: $severity-low; }
         &.score--mid  { border-color: $severity-medium; }
         &.score--low  { border-color: $severity-high; }
     }
- 
+
     &__value {
         font-size: 1.6rem;
         font-weight: 800;
         color: $text-primary;
         line-height: 1;
- 
+
         @media (max-width: 1024px) { font-size: 1.3rem; }
     }
- 
+
     &__pct {
         font-size: 0.75rem;
         color: $text-muted;
         margin-top: -2px;
     }
- 
+
     &__info {
         display: none; // hidden on desktop (ring has sub below it)
- 
+
         @media (max-width: 1024px) {
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
         }
     }
- 
+
     &__info-label {
         font-size: 0.7rem;
         font-weight: 600;
@@ -873,7 +661,7 @@ $severity-low:    #3fb950;
         letter-spacing: 0.08em;
         color: $text-muted;
     }
- 
+
     &__sub {
         margin: 0;
         font-size: 0.75rem;
@@ -881,18 +669,18 @@ $severity-low:    #3fb950;
         text-align: center;
     }
 }
- 
+
 // ── Skill Gaps ────────────────────────────────────────────────────────────────
 .skill-gaps {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
- 
+
     @media (max-width: 1024px) {
         flex: 2;
         min-width: 200px;
     }
- 
+
     &__label {
         font-size: 0.75rem;
         font-weight: 600;
@@ -901,14 +689,14 @@ $severity-low:    #3fb950;
         color: $text-muted;
         margin: 0;
     }
- 
+
     &__list {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
     }
 }
- 
+
 .skill-tag {
     font-size: 0.775rem;
     font-weight: 500;
@@ -916,43 +704,27 @@ $severity-low:    #3fb950;
     border-radius: 0.4rem;
     border: 1px solid;
     cursor: default;
- 
+
     @media (max-width: 480px) {
         font-size: 0.72rem;
         padding: 0.25rem 0.6rem;
     }
- 
+
     &--high {
         color: $severity-high;
         background-color: rgba($severity-high, 0.1);
         border-color: rgba($severity-high, 0.25);
     }
- 
+
     &--medium {
         color: $severity-medium;
         background-color: rgba($severity-medium, 0.1);
         border-color: rgba($severity-medium, 0.25);
     }
- 
+
     &--low {
         color: $severity-low;
         background-color: rgba($severity-low, 0.1);
         border-color: rgba($severity-low, 0.25);
     }
 }
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
