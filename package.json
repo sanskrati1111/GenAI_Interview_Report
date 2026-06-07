@@ -2,12 +2,11 @@
   "name": "projects",
   "version": "1.0.0",
   "description": "",
-  "main": "backend/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx nodemon backend/server.js",
     "build": "npm install && npm install --prefix Frontend && npm run build --prefix Frontend",
-    "start": "npx nodemon backend/server.js"
+    "start": "node backend/server.js"
   },
   "keywords": [],
   "author": "",
